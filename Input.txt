@@ -1,0 +1,16 @@
+name = q(ProStrelok);
+server = q(localhost);
+
+network -> {
+    name -> ^[name].
+    server -> ^[server].
+    game -> {
+        name -> q(WoTB).
+        players -> {
+            player -> {
+                name -> q(player1).
+                level -> q(odin).
+            }.
+        }.
+    }.
+}.
