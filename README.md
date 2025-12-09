@@ -57,3 +57,60 @@ network:
 ```python main.py input.txt > output.yml```\
 or\
 ```Get-Content input.txt -Raw | python main.py > output.yml```
+
+## Запуск тестов
+```python -m unittest test_parser.py```
+
+## Примеры input.txt
+### Пример 1
+```
+name = q(ProStrelok);
+server = q(localhost);
+
+network -> {
+    name -> ^[name].
+    server -> ^[server].
+    game -> {
+        name -> q(WoTB).
+        players -> {
+            player -> {
+                name -> q(player1).
+                level -> q(odin).
+            }.
+        }.
+    }.
+}
+```
+### Пример 2
+```
+defaultAge = 18;
+defaultRole = q(User);
+
+user -> {
+    name -> q(Alex).
+    age -> ^[defaultAge].
+    role -> ^[defaultRole].
+    preferences -> {
+        theme -> q(Dark).
+        notifications -> q(Enabled).
+    }.
+}
+```
+### Пример 3
+```
+baseDamage = 50;
+baseWeight = 12;
+
+weapon -> {
+    title -> q(Sword).
+    stats -> {
+        damage -> ^[baseDamage].
+        weight -> ^[baseWeight].
+        rarity -> q(Rare).
+    }.
+    owner -> {
+        name -> q(Player1).
+        level -> 5.
+    }.
+}
+```
