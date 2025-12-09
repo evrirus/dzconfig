@@ -1,30 +1,45 @@
 import unittest
+from lark import Lark
+from main import GRAMMAR, AST, tree_to_plain, clean_tree
 
-from main import Lexer, Parser  # Импортируем ваш парсер из main.py
-
-# python -m unittest test_parser.py
 class TestConfigParser(unittest.TestCase):
 
-    def parse_and_compare(self, input_text, expected_dict):
-        # Создаём лексер и парсер
-        lexer = Lexer(input_text)
-        parser = Parser(lexer)
-        result = parser.parse()
-        self.assertEqual(result, expected_dict)
+    def parse_and_compare(self, text, expected):
+        parser = Lark(GRAMMAR, parser="lalr", transformer=AST())
+        result = parser.parse(text)
+        plain_result = tree_to_plain(result)
+        clean_result = clean_tree(plain_result)
 
-    def test_network_config(self):
-        input_text = """
+        # main.py возвращает список верхнеуровневых словарей
+        # объединяем все словари в один для удобного сравнения
+        merged_result = {}
+        if isinstance(clean_result, list):
+            for d in clean_result:
+                if isinstance(d, dict):
+                    merged_result.update(d)
+        else:
+            merged_result = clean_result
+
+        self.assertEqual(merged_result, expected)
+
+    def test_network_game_config(self):
+        text = """
         name = q(ProStrelok);
         server = q(localhost);
-        
+
         network -> {
             name -> ^[name].
             server -> ^[server].
             game -> {
                 name -> q(WoTB).
+                players -> {
+                    player -> {
+                        name -> q(player1).
+                        level -> q(odin).
+                    }.
+                }.
             }.
-        }.
-
+        }
         """
         expected = {
             "name": "ProStrelok",
@@ -34,13 +49,19 @@ class TestConfigParser(unittest.TestCase):
                 "server": "localhost",
                 "game": {
                     "name": "WoTB",
+                    "players": {
+                        "player": {
+                            "name": "player1",
+                            "level": "odin"
+                        }
+                    }
                 }
             }
         }
-        self.parse_and_compare(input_text, expected)
+        self.parse_and_compare(text, expected)
 
-    def test_user_config(self):
-        input_text = """
+    def test_user_preferences_config(self):
+        text = """
         defaultAge = 18;
         defaultRole = q(User);
 
@@ -52,7 +73,7 @@ class TestConfigParser(unittest.TestCase):
                 theme -> q(Dark).
                 notifications -> q(Enabled).
             }.
-        }.
+        }
         """
         expected = {
             "defaultAge": 18,
@@ -67,10 +88,10 @@ class TestConfigParser(unittest.TestCase):
                 }
             }
         }
-        self.parse_and_compare(input_text, expected)
+        self.parse_and_compare(text, expected)
 
-    def test_game_config(self):
-        input_text = """
+    def test_weapon_rpg_config(self):
+        text = """
         baseDamage = 50;
         baseWeight = 12;
 
@@ -85,8 +106,7 @@ class TestConfigParser(unittest.TestCase):
                 name -> q(Player1).
                 level -> 5.
             }.
-            здфн
-        }.
+        }
         """
         expected = {
             "baseDamage": 50,
@@ -104,8 +124,7 @@ class TestConfigParser(unittest.TestCase):
                 }
             }
         }
-        self.parse_and_compare(input_text, expected)
-
+        self.parse_and_compare(text, expected)
 
 if __name__ == "__main__":
     unittest.main()
