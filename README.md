@@ -21,7 +21,7 @@
 
 ```text
 name = q(ProStrelok);
-server = q(localhost);
+server = 222;
 
 network -> {
     name -> ^[name].
@@ -40,10 +40,10 @@ network -> {
 ### Вывод
 ```yaml
 name: ProStrelok
-server: localhost
+server: 222
 network:
   name: ProStrelok
-  server: localhost
+  server: 222
   game:
     name: WoTB
     players:
